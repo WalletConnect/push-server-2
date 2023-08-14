@@ -21,7 +21,7 @@ pub mod prelude {
 use {crate::state::AppState, prelude::*};
 
 pub async fn bootstrap(
-    shutdown: broadcast::Receiver<()>,
+    mut shutdown: broadcast::Receiver<()>,
     config: EnvConfig,
 ) -> prelude::Result<()> {
     let port = config.port.clone();
