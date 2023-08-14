@@ -99,7 +99,6 @@ jobs:
             const previousCoverage = parseFloat('${{ steps.coverage_change.outputs.previous_coverage }}');
             const currentCoverage = parseFloat('${{ steps.coverage_change.outputs.current_coverage }}');
 
-            const context = github.context.payload;
             const prNumber = context.pull_request.number;
 
             const getColor = (value, size) => {
