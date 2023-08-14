@@ -45,13 +45,23 @@ jobs:
           git clone --depth=1 --branch ${{ github.base_ref }} https://github.com/${{ github.repository }} /tmp/target_branch
         working-directory: /tmp
 
+      - name: Build Release Binary - Current Branch
+        run: |
+          cd /tmp/current_branch
+          cargo build --release --all-features
+          mv target/release/push-server /tmp/current_binary
+
+      - name: Build Release Binary - Target Branch
+        run: |
+          cd /tmp/target_branch
+          cargo build --release --all-features
+          mv target/release/push-server /tmp/target_binary
+
       - name: Calculate Binary Size Change
         id: size_change
         run: |
-          cd /tmp/target_branch
-          previous_size=$(cargo bloat --release --crates | grep "Total" | awk '{print $3}' | tr -d ',')
-          cd /tmp/current_branch
-          current_size=$(cargo bloat --release --crates | grep "Total" | awk '{print $3}' | tr -d ',')
+          previous_size=$(stat -c %s /tmp/target_binary)
+          current_size=$(stat -c %s /tmp/current_binary)
           size_change=$((current_size - previous_size))
           echo "::set-output name=size_change::$size_change"
           echo "::set-output name=previous_size::$previous_size"
@@ -61,9 +71,9 @@ jobs:
         id: coverage_change
         run: |
           cd /tmp/target_branch
-          previous_coverage=$(cargo tarpaulin -o Json --output-dir /tmp/coverage-target --workspace | jq '.report.covered_percent')
+          previous_coverage=$(cargo tarpaulin -o Json --all-features --output-dir /tmp/coverage-target --workspace | jq '.report.covered_percent')
           cd /tmp/current_branch
-          current_coverage=$(cargo tarpaulin -o Json --output-dir /tmp/coverage-current --workspace | jq '.report.covered_percent')
+          current_coverage=$(cargo tarpaulin -o Json --all-features --output-dir /tmp/coverage-current --workspace | jq '.report.covered_percent')
           coverage_change=$(echo "scale=2; $current_coverage - $previous_coverage" | bc)
           echo "::set-output name=coverage_change::$coverage_change"
           echo "::set-output name=previous_coverage::$previous_coverage"
