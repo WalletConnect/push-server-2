@@ -1,7 +1,7 @@
-use push_server::config::DEFAULT_PORT;
-use crate::ENV_MUTEX;
+use {crate::ENV_MUTEX, push_server::config::DEFAULT_PORT};
 
-/// Function that removes all set env vars, executes a function and then sets them all back.
+/// Function that removes all set env vars, executes a function and then sets
+/// them all back.
 pub fn env_bubble(variables: Vec<(&str, &str)>, bubble: fn() -> ()) {
     let vars_before = std::env::vars();
     for (k, _v) in std::env::vars() {
@@ -29,23 +29,29 @@ fn config_err_missing_env_var() {
 }
 
 #[test]
-/// Test to check that EnvConfig loads values correctly both from defaults and from ENV
-/// This function should be updated when new values are added.
+/// Test to check that EnvConfig loads values correctly both from defaults and
+/// from ENV This function should be updated when new values are added.
 fn config_uses_correct_values() {
     let _gaurd = ENV_MUTEX.lock().unwrap();
 
-    env_bubble(vec![("DATABASE_URL", "postgres://localhost:5432"), ("PUBLIC_URL", "https://test.walletconnect.com")], || {
-        let config_result = push_server::config::get_config();
+    env_bubble(
+        vec![
+            ("DATABASE_URL", "postgres://localhost:5432"),
+            ("PUBLIC_URL", "https://test.walletconnect.com"),
+        ],
+        || {
+            let config_result = push_server::config::get_config();
 
-        assert!(config_result.is_ok());
+            assert!(config_result.is_ok());
 
-        let config = config_result.unwrap();
+            let config = config_result.unwrap();
 
-        // Default Values
-        assert_eq!(config.port, DEFAULT_PORT);
+            // Default Values
+            assert_eq!(config.port, DEFAULT_PORT);
 
-        // Configured using ENV
-        assert_eq!(config.database_url, "postgres://localhost:5432");
-        assert_eq!(config.public_url, "https://test.walletconnect.com");
-    })
+            // Configured using ENV
+            assert_eq!(config.database_url, "postgres://localhost:5432");
+            assert_eq!(config.public_url, "https://test.walletconnect.com");
+        },
+    )
 }
