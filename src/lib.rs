@@ -24,7 +24,7 @@ pub async fn bootstrap(
     mut shutdown: broadcast::Receiver<()>,
     config: EnvConfig,
 ) -> prelude::Result<()> {
-    let port = config.port.clone();
+    let port = config.port;
 
     let state = AppState::new(config);
     let state_arc = Arc::new(state);

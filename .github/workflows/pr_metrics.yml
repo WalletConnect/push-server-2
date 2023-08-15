@@ -99,7 +99,8 @@ jobs:
             const previousCoverage = parseFloat('${{ steps.coverage_change.outputs.previous_coverage }}');
             const currentCoverage = parseFloat('${{ steps.coverage_change.outputs.current_coverage }}');
 
-            const prNumber = context.pull_request.number;
+            const payload = github.context.payload;
+            const prNumber = payload.pull_request.number;
 
             const getColor = (value, size) => {
               if (value === 0) return 'black';
@@ -121,7 +122,7 @@ jobs:
 
             github.issues.createComment({
               issue_number: prNumber,
-              owner: context.repository.owner.login,
-              repo: context.repository.name,
+              owner: payload.repository.owner.login,
+              repo: payload.repository.name,
               body: message
             });
