@@ -1,6 +1,4 @@
-pub struct Logger {
-
-}
+pub struct Logger {}
 
 impl Logger {
     pub fn init() -> crate::prelude::Result<Self> {
@@ -14,6 +12,7 @@ impl Logger {
 
 impl Drop for Logger {
     fn drop(&mut self) {
-        // TODO: Shutdown anything that is running e.g. Traces for Open Telemetry
+        // TODO: Shutdown anything that is running e.g. Traces for Open
+        // Telemetry
     }
 }
