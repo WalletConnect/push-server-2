@@ -31,10 +31,6 @@ jobs:
           cargo install cargo-bloat
           cargo install cargo-tarpaulin
 
-      - name: Ensure Build
-        run: |
-          cargo build --release
-
       - name: Clone Current Branch
         run: |
           git clone --depth=1 --branch ${{ github.head_ref }} https://github.com/${{ github.repository }} /tmp/current_branch
@@ -88,6 +84,8 @@ jobs:
 
       - name: Comment on Pull Request
         uses: actions/github-script@v4
+        # TODO: fix before re-enabling
+        if: false
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
