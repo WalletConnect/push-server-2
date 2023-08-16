@@ -1,9 +1,14 @@
 use {
     crate::config::EnvConfig,
     axum::{routing::get, Router},
-    std::{net::SocketAddr, sync::Arc},
+    sqlx::{
+        postgres::{PgConnectOptions, PgPoolOptions},
+        ConnectOptions,
+    },
+    std::{net::SocketAddr, str::FromStr, sync::Arc, time::Duration},
     tokio::{select, sync::broadcast},
     tower::ServiceBuilder,
+    tracing::log::LevelFilter,
 };
 
 pub mod config;
@@ -11,6 +16,7 @@ pub mod error;
 pub mod handlers;
 pub mod log;
 pub mod state;
+pub mod stores;
 
 pub mod prelude {
     pub type Result<T> = std::result::Result<T, crate::error::Error>;
@@ -18,7 +24,13 @@ pub mod prelude {
     pub use tracing::{debug, error, info, warn};
 }
 
-use {crate::state::AppState, prelude::*};
+use {
+    crate::{state::AppState},
+    prelude::*,
+};
+
+#[cfg(not(feature = "multitenant"))]
+use crate::{stores::tenant::DefaultTenantStore};
 
 pub async fn bootstrap(
     mut shutdown: broadcast::Receiver<()>,
@@ -26,7 +38,43 @@ pub async fn bootstrap(
 ) -> prelude::Result<()> {
     let port = config.port;
 
-    let state = AppState::new(config);
+    let pg_options = PgConnectOptions::from_str(&config.tenant_database_url)?
+        .log_statements(LevelFilter::Debug)
+        .log_slow_statements(LevelFilter::Warn, Duration::from_millis(250))
+        .clone();
+
+    let database = PgPoolOptions::new()
+        .max_connections(15)
+        .min_connections(5)
+        .connect_lazy_with(pg_options);
+
+    sqlx::migrate!("./migrations").run(&database).await?;
+
+    let store = Arc::new(database);
+
+    #[cfg(not(feature = "multitenant"))]
+    let tenant_store = Arc::new(DefaultTenantStore::new());
+
+    #[cfg(feature = "multitenant")]
+    let tenant_store = {
+        let tenant_pg_options = PgConnectOptions::from_str(&config.tenant_database_url)?
+            .log_statements(LevelFilter::Debug)
+            .log_slow_statements(LevelFilter::Warn, Duration::from_millis(250))
+            .clone();
+
+        let tenant_database = PgPoolOptions::new()
+            .max_connections(15)
+            .min_connections(5)
+            .connect_lazy_with(tenant_pg_options);
+
+        sqlx::migrate!("./tenant_migrations")
+            .run(&tenant_database)
+            .await?;
+
+        Arc::new(tenant_database)
+    };
+
+    let state = AppState::new(config, store, tenant_store);
     let state_arc = Arc::new(state);
 
     let global_middleware = ServiceBuilder::new();

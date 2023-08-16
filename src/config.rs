@@ -8,6 +8,8 @@ pub struct EnvConfig {
     pub public_url: String,
 
     pub database_url: String,
+    #[cfg(feature = "multitenant")]
+    pub tenant_database_url: String,
 }
 
 fn default_port() -> u16 {
