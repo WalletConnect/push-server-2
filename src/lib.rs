@@ -24,13 +24,10 @@ pub mod prelude {
     pub use tracing::{debug, error, info, warn};
 }
 
-use {
-    crate::{state::AppState},
-    prelude::*,
-};
+use {crate::state::AppState, prelude::*};
 
 #[cfg(not(feature = "multitenant"))]
-use crate::{stores::tenant::DefaultTenantStore};
+use crate::stores::tenant::DefaultTenantStore;
 
 pub async fn bootstrap(
     mut shutdown: broadcast::Receiver<()>,
