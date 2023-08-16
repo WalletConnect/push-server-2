@@ -35,7 +35,7 @@ pub async fn bootstrap(
 ) -> prelude::Result<()> {
     let port = config.port;
 
-    let pg_options = PgConnectOptions::from_str(&config.tenant_database_url)?
+    let pg_options = PgConnectOptions::from_str(&config.database_url)?
         .log_statements(LevelFilter::Debug)
         .log_slow_statements(LevelFilter::Warn, Duration::from_millis(250))
         .clone();

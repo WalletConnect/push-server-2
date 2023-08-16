@@ -36,7 +36,12 @@ fn config_uses_correct_values() {
 
     env_bubble(
         vec![
-            ("DATABASE_URL", "postgres://localhost:5432"),
+            ("DATABASE_URL", "postgres://localhost:5432/echo"),
+            #[cfg(feature = "multitenant")]
+            (
+                "TENANT_DATABASE_URL",
+                "postgres://localhost:5432/echo-tenants",
+            ),
             ("PUBLIC_URL", "https://test.walletconnect.com"),
         ],
         || {
@@ -50,7 +55,12 @@ fn config_uses_correct_values() {
             assert_eq!(config.port, DEFAULT_PORT);
 
             // Configured using ENV
-            assert_eq!(config.database_url, "postgres://localhost:5432");
+            assert_eq!(config.database_url, "postgres://localhost:5432/echo");
+            #[cfg(feature = "multitenant")]
+            assert_eq!(
+                config.tenant_database_url,
+                "postgres://localhost:5432/echo-tenants"
+            );
             assert_eq!(config.public_url, "https://test.walletconnect.com");
         },
     )
