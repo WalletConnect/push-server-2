@@ -43,7 +43,8 @@ pub async fn bootstrap(
     let database = PgPoolOptions::new()
         .max_connections(15)
         .min_connections(5)
-        .connect_lazy_with(pg_options);
+        .connect_with(pg_options)
+        .await?;
 
     sqlx::migrate!("./migrations").run(&database).await?;
 
@@ -62,7 +63,8 @@ pub async fn bootstrap(
         let tenant_database = PgPoolOptions::new()
             .max_connections(15)
             .min_connections(5)
-            .connect_lazy_with(tenant_pg_options);
+            .connect_with(tenant_pg_options)
+            .await?;
 
         sqlx::migrate!("./tenant_migrations")
             .run(&tenant_database)
