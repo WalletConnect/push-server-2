@@ -26,7 +26,7 @@ impl PushServer {
         let public_port = get_random_port();
         let config = EnvConfig {
             port: public_port,
-            public_url: "".to_string(),
+            public_url: format!("http://127.0.0.1:{public_port}"),
             database_url: DATABASE_URL.to_string(),
             #[cfg(feature = "multitenant")]
             tenant_database_url: TENANT_DATABASE_URL.to_string(),

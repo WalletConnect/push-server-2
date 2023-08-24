@@ -29,16 +29,32 @@ pub struct Client {
     pub relay_id: String,
 
     pub registered_at: DateTime<Utc>,
+    pub deleted_at: Option<DateTime<Utc>>
+}
+
+pub struct RelayMeta {
+    pub url: String,
+    pub id: String
 }
 
 #[async_trait::async_trait]
 pub trait ClientStore {
-    async fn create_or_update_client(&self) -> Result<Client>;
+    async fn create_or_update_client(&self, tenant_id: String, id: String, _type: ProviderKind, token: String, relay: RelayMeta) -> Result<Client>;
+    async fn get_client(&self, tenant_id: String, id: String) -> Result<Client>;
+    async fn delete_client(&self, tenant_id: String, id: String, soft: bool) -> Result<()>;
 }
 
 #[async_trait::async_trait]
 impl ClientStore for PgPool {
-    async fn create_or_update_client(&self) -> Result<Client> {
+    async fn create_or_update_client(&self, tenant_id: String, id: String, _type: ProviderKind, token: String, relay: RelayMeta) -> Result<Client> {
+        todo!()
+    }
+
+    async fn get_client(&self, tenant_id: String, id: String) -> Result<Client> {
+        todo!()
+    }
+
+    async fn delete_client(&self, tenant_id: String, id: String, soft: bool) -> Result<()> {
         todo!()
     }
 }

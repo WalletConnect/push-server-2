@@ -1,7 +1,8 @@
 use build_info::BuildInfo;
 
-mod context;
-mod health;
+pub mod context;
+pub mod server;
+pub mod store;
 
 
 build_info::build_info!(fn build_info);
