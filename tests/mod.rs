@@ -6,3 +6,6 @@ lazy_static::lazy_static! {
 }
 
 mod unit;
+
+#[cfg(feature = "functional_tests")]
+mod functional;

@@ -72,15 +72,20 @@ jobs:
             args: -- --check
             cache: {}
             rustc: nightly
-          - name: "Unit Tests (all features)"
+          - name: "Tests (all features)"
             cmd: test
             args: --all-features
-            cache: { sharedKey: "tests" }
+            cache: { sharedKey: "tests-all-features" }
             rustc: stable
           - name: "Unit Tests (stripped)"
             cmd: test
             args: ""
-            cache: { sharedKey: "tests" }
+            cache: { sharedKey: "tests-unit-stripped" }
+            rustc: stable
+          - name: "Unit Tests (multi-tenant)"
+            cmd: test
+            args: --features multitenant
+            cache: { sharedKey: "tests-unit-multi" }
             rustc: stable
         include:
           - os: ubuntu-latest
