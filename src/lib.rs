@@ -17,6 +17,7 @@ pub mod handlers;
 pub mod log;
 pub mod state;
 pub mod stores;
+pub mod providers;
 
 pub mod prelude {
     pub type Result<T> = std::result::Result<T, crate::error::Error>;
