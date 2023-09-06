@@ -1,14 +1,20 @@
 #-------------------------------------------------------------------------------
-# Configuration
+# Application
 
-variable "grafana_auth" {
-  description = "The API Token for the Grafana instance"
+variable "cloud_api_key" {
+  description = "The authentication key for the cloud API"
   type        = string
-  default     = ""
+  sensitive   = true
+}
+
+variable "jwt_secret" {
+  description = "The secret used to sign JWT tokens"
+  type        = string
+  sensitive   = true
 }
 
 #-------------------------------------------------------------------------------
-# Application
+# ECS
 
 variable "name" {
   description = "The name of the application"
@@ -31,9 +37,23 @@ variable "log_level" {
   type        = string
 }
 
+#-------------------------------------------------------------------------------
+# Analytics
+
+variable "geoip_db_key" {
+  description = "The name to the GeoIP database"
+  type        = string
+  default     = "GeoLite2-City.mmdb"
+}
 
 #-------------------------------------------------------------------------------
 # Monitoring
+
+variable "grafana_auth" {
+  description = "The API Token for the Grafana instance"
+  type        = string
+  default     = ""
+}
 
 variable "notification_channels" {
   description = "The notification channels to send alerts to"

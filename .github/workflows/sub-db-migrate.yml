@@ -1,0 +1,38 @@
+name: ❖ Database - Migrate
+
+on:
+  workflow_call:
+    inputs:
+      stage:
+        description: 'the environment on which to perform database migrations'
+        required: true
+        type: string
+        default: 'staging'
+      stage-url:
+        description: 'the URL of the environment'
+        required: true
+        type: string
+        default: https://${{ vars.SUBDOMAIN_NAME }}.walletconnect.com/health
+
+permissions:
+  contents: read
+
+concurrency: ${{ inputs.stage }}
+
+jobs:
+  migrate:
+    name: Migrate `${{ inputs.stage }}`
+    runs-on:
+      group: ${{ vars.RUN_GROUP }}
+    environment:
+      name: ${{ inputs.stage }}
+      url: ${{ inputs.stage-url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials for `${{ inputs.stage }}`
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ inputs.stage == 'prod' && vars.AWS_ROLE_PROD || vars.AWS_ROLE_STAGING }}
+          aws-region: ${{ vars.AWS_REGION }}

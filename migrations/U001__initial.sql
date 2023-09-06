@@ -1,4 +1,4 @@
-CREATE SCHEMA public;
+CREATE SCHEMA IF NOT EXISTS public;
 
 CREATE TYPE public.push_type AS ENUM ('fcm', 'apns', 'apns_sandbox', 'noop');
 
